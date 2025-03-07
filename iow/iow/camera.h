@@ -11,6 +11,11 @@ class camera {
 		int samples_per_pixel = 10;
 		int max_depth = 10;
 
+		double vfov = 90;
+		point3 lookfrom = point3(0, 0, 0);
+		point3 lookat = point3(0, 0, -1);
+		vec3 vup = vec3(0, 1, 0);
+
 		void render(const hittable& world) {
 			initialize();
 
@@ -41,6 +46,7 @@ class camera {
 		point3 pixel00_loc;
 		vec3 pixel_delta_u;
 		vec3 pixel_delta_v;
+		vec3 u, v, w;
 
 		void initialize(){
 			im_height = int(im_width / aspect_ratio);
@@ -51,18 +57,25 @@ class camera {
 
 			pixel_samples_scale = 1.0 / samples_per_pixel;
 
-			auto focal_len = 1.0;
-			auto viewp_height = 2.0;
-			auto viewp_width = viewp_height * (double(im_width) / im_height);
-			cam_center = point3(0, 0, 0);
+			cam_center = lookfrom;
 
-			auto viewp_u = vec3(viewp_width, 0, 0);
-			auto viewp_v = vec3(0, -viewp_height, 0);
+			auto focal_len = (lookfrom - lookat).length();
+			auto theta = degrees_to_radians(vfov);
+			auto h = std::tan(theta / 2);
+			auto viewp_height = 2.0 * h * focal_len;
+			auto viewp_width = viewp_height * (double(im_width) / im_height);
+
+			w = unit_vector(lookfrom - lookat);
+			u = unit_vector(cross(vup, w));
+			v = cross(w, u);
+
+			vec3 viewp_u = viewp_width * u;
+			vec3 viewp_v = viewp_height * -v;
 
 			pixel_delta_u = viewp_u / im_width;
 			pixel_delta_v = viewp_v / im_height;
 
-			auto viewp_upper_left = cam_center - vec3(0, 0, focal_len) - (viewp_u / 2) - (viewp_v / 2);
+			auto viewp_upper_left = cam_center - (focal_len * w) - viewp_u / 2 - viewp_v / 2;
 			pixel00_loc = viewp_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 		}
 
