@@ -11,14 +11,14 @@ int main() {
     hittable_list world;
 
     auto ground_material = make_shared <lambertian>(color(0.5, 0.5, 0.5));
-    world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
+    world.add(make_shared<sphere>(point3(0, -500, 0), 500, ground_material));
 
     for (int i = -11; i < 11; i++)
     {
         for (int j = -11; j < 11; j++)
         {
             auto choose_mat = random_double();
-            point3 center(i + 0.9 * random_double(), 0.2, j + 0.9 * random_double());
+            point3 center(i = 0.9 * random_double(), 0.2, j + 0.9 * random_double());
 
             if ((center - point3(4, 0.2, 0)).length() > 0.9)
             {
@@ -53,7 +53,7 @@ int main() {
     camera cam;
 
     cam.aspect_ratio = 16.0 / 10.0;
-    cam.im_width = 1024;
+    cam.im_width = 1600;
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
 
